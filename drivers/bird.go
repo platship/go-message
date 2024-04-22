@@ -29,7 +29,7 @@ func (c *Bird) headers() []*curlx.Headers {
 		Name:  "Authorization",
 		Value: "AccessKey " + c.AccessKey,
 	})
-	headers = append(headers, &curl.Headers{
+	headers = append(headers, &curlx.Headers{
 		Name:  "Content-Type",
 		Value: "application/json",
 	})
@@ -37,7 +37,7 @@ func (c *Bird) headers() []*curlx.Headers {
 }
 
 // 获取钩子列表
-func (c *Bird) WebhookSubscriptionList(organizationId string) (res []*BirdResultBase, err error) {
+func (c *Bird) WebhookSubscriptionList(organizationId string) (res []*dto.BirdResultBase, err error) {
 	path := BaseUrl + "/organizations/" + organizationId + "/workspaces/" + c.WorkspaceId + "/webhook-subscriptions"
 	data, err := curlx.Get(path, c.headers()...)
 	if err != nil {
