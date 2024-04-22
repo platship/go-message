@@ -13,19 +13,17 @@ const (
 	BirdCallbackUrl = ""
 )
 
-var Bird = new(ConfigServ)
-
-type ConfigServ struct {
+type Bird struct {
 	AccessKey   string `json:"accessKey"`
 	WorkspaceId string `json:"workspaceId"`
 	SigningKey  string `json:"signingKey"`
 }
 
-func (ConfigServ) Set(accessKey, workspaceId string) *ConfigServ {
-	return &ConfigServ{AccessKey: accessKey, WorkspaceId: workspaceId, SigningKey: "bird"}
+func (Bird) Set(accessKey, workspaceId string) *Bird {
+	return &Bird{AccessKey: accessKey, WorkspaceId: workspaceId, SigningKey: "bird"}
 }
 
-func (c *ConfigServ) headers() []*curlx.Headers {
+func (c *Bird) headers() []*curlx.Headers {
 	var headers []*curlx.Headers
 	headers = append(headers, &curlx.Headers{
 		Name:  "Authorization",
@@ -39,19 +37,19 @@ func (c *ConfigServ) headers() []*curlx.Headers {
 }
 
 // 获取钩子列表
-func (c *ConfigServ) WebhookSubscriptionList(organizationId string) (res []*BirdResultBase, err error) {
+func (c *Bird) WebhookSubscriptionList(organizationId string) (res []*BirdResultBase, err error) {
 	path := BaseUrl + "/organizations/" + organizationId + "/workspaces/" + c.WorkspaceId + "/webhook-subscriptions"
 	data, err := curlx.Get(path, c.headers()...)
 	if err != nil {
 		return nil, err
 	}
-	var birdCallback BirdCallback
+	var birdCallback dto.BirdCallback
 	json.Unmarshal(data, &birdCallback)
 	return birdCallback.Results, nil
 }
 
 // 更新钩子
-func (c *ConfigServ) WebhookSubscriptionPacth(organizationId, id string) (err error) {
+func (c *Bird) WebhookSubscriptionPacth(organizationId, id string) (err error) {
 	path := BaseUrl + "/organizations/" + organizationId + "/workspaces/" + c.WorkspaceId + "/webhook-subscriptions"
 	newData := make(map[string]interface{})
 	newData["url"] = BirdCallbackUrl
@@ -64,7 +62,7 @@ func (c *ConfigServ) WebhookSubscriptionPacth(organizationId, id string) (err er
 	return
 }
 
-func (c *ConfigServ) WebhookSubscriptionPost(organizationId, event string) (err error) {
+func (c *Bird) WebhookSubscriptionPost(organizationId, event string) (err error) {
 	path := BaseUrl + "/organizations/" + organizationId + "/workspaces/" + c.WorkspaceId + "/webhook-subscriptions"
 	var datas = make(map[string]interface{})
 	datas["service"] = "channels"
@@ -101,7 +99,7 @@ type Contacts struct {
 	IdentifierKey   string `json:"identifierKey"`
 }
 
-func (c *ConfigServ) ChannelMessagePost(channelId, phone, text string) (id string, err error) {
+func (c *Bird) ChannelMessagePost(channelId, phone, text string) (id string, err error) {
 	path := BaseUrl + "/workspaces/" + c.WorkspaceId + "/channels/{channelId}/messages"
 	var contacts []Contacts
 	contacts = append(contacts, Contacts{IdentifierKey: "phonenumber", IdentifierValue: phone})
@@ -109,11 +107,26 @@ func (c *ConfigServ) ChannelMessagePost(channelId, phone, text string) (id strin
 		MessageBody{Type: "text", Text: TextStr{Text: text}},
 		MessageReceiver{Contacts: contacts},
 	}
-	result, err := curlx.Post(path, datas, c.headers())
+	result, err := curlx.Post(path, datas, c.headers()...)
 	if err != nil {
 		return "", errors.New("添加钩子失败")
 	}
 	var res *dto.ResChannelMessage
 	json.Unmarshal(result, &res)
 	return res.ID, nil
+}
+
+func (s *Bird) Init() (err error) {
+	if s.AccessKey == "" {
+		return errors.New("API Key is undefined")
+	}
+	if s.AccessKey == "" {
+		return errors.New("API Url is undefined")
+	}
+	return
+}
+
+func (s *Bird) Send() error {
+	// 发送信息
+	return nil
 }
