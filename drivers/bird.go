@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/fasthey/go-message/dto"
-	"github.com/fasthey/go-utils/curlx"
+	"github.com/rehok/go-message/dto"
+	"github.com/rehok/go-utils/curlx"
 )
 
 const (
