@@ -3,8 +3,8 @@ package facade
 import (
 	"errors"
 
-	"github.com/rehok/go-message"
-	"github.com/rehok/go-message/drivers"
+	"github.com/platship/go-message"
+	"github.com/platship/go-message/drivers"
 )
 
 type Message struct {
