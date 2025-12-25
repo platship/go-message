@@ -3,8 +3,8 @@ package facade
 import (
 	"errors"
 
-	"github.com/platship/go-message"
-	"github.com/platship/go-message/drivers"
+	"fastix.ai/go-message"
+	"fastix.ai/go-message/drivers"
 )
 
 type Message struct {
